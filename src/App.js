@@ -5,9 +5,11 @@ import UserViewModel from "./viewmodels/UserViewModel";
 import UserList from "./components/UserList";
 import AddUserForm from "./components/AddUserForm";
 import AssignTasks from "./components/AssignTasks";
+import TaskList from "./components/TaskList";
+import DashBoard from "./components/DashBoard";
 
 const App = () => {
-  const { users, handleAddUser, handleAssignTasks } = UserViewModel();
+  const { users, handleAddUser, handleAssignTasks, handleDashboard} = UserViewModel();
 
   return (
     <Router>
@@ -17,17 +19,19 @@ const App = () => {
         {/* Navigation Links */}
         <nav>
           <ul>
-            <li><Link to="/">Dashboard</Link></li>
+            <li><Link to="/DashBoard">Dashboard</Link></li>
             <li><Link to="/add-user">Add User</Link></li>
             <li><Link to="/assign-tasks">Assign Tasks</Link></li>
           </ul>
         </nav>
 
         {/* Routes */}
-        <Routes>
-          <Route path="/" element={<UserList users={users} />} />
-          <Route path="/add-user" element={<AddUserForm onAddUser={handleAddUser} />} />
+          <Routes>
+          <Route path="/DashBoard" element={<DashBoard DashBoard={handleDashboard} />} />
+          <Route path="/users" element={<UserList users={users} />} /> 
+          <Route path="/add-user" element={<AddUserForm onAddUser={handleAddUser} />} />         
           <Route path="/assign-tasks" element={<AssignTasks assignTasks={handleAssignTasks} />} />
+          <Route path="/tasks" element={<TaskList />} />
         </Routes>
       </div>
     </Router>
