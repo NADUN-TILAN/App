@@ -9,7 +9,7 @@ import TaskList from "./components/TaskList";
 import DashBoard from "./components/DashBoard";
 
 const App = () => {
-  const { users, handleAddUser, handleAssignTasks, handleDashboard} = UserViewModel();
+  const { handleusers, handleAddUser, handleAssignTasks, handleDashboard} = UserViewModel();
 
   return (
     <Router>
@@ -21,14 +21,16 @@ const App = () => {
           <ul>
             <li><Link to="/DashBoard">Dashboard</Link></li>
             <li><Link to="/add-user">Add User</Link></li>
+            <li><Link to="/user-list">User List</Link></li>
             <li><Link to="/assign-tasks">Assign Tasks</Link></li>
+            <li><Link to="/tasks">Tasks List</Link></li>
           </ul>
         </nav>
 
         {/* Routes */}
           <Routes>
           <Route path="/DashBoard" element={<DashBoard DashBoard={handleDashboard} />} />
-          <Route path="/users" element={<UserList users={users} />} /> 
+          <Route path="/user-list" element={<UserList users={handleusers} />} /> 
           <Route path="/add-user" element={<AddUserForm onAddUser={handleAddUser} />} />         
           <Route path="/assign-tasks" element={<AssignTasks assignTasks={handleAssignTasks} />} />
           <Route path="/tasks" element={<TaskList />} />

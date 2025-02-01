@@ -13,7 +13,7 @@ const TaskList = () => {
 
   return (
     <div className="container mt-4">
-      <h2>Assigned Tasks</h2>
+      <h2 className="text-center mb-4">List of Assigned Tasks</h2>
       <Table striped bordered hover>
         <thead>
           <tr>
