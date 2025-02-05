@@ -1,0 +1,3 @@
+[submodule "Backend/path/to/WebApp"]
+	path = Backend/path/to/WebApp
+	url = https://github.com/NADUN-TILAN/WebApp.git
