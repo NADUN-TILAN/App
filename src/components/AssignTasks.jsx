@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 
 const AssignTask = () => {
@@ -9,15 +9,34 @@ const AssignTask = () => {
     category: '',
     description: '',
     assignor: '',
-    uploadDocument: null,
+    uploadedDocs: null,
   });
+
+  const [assignees, setAssignees] = useState([]);
+
+  useEffect(() => {
+    // Fetch assignees from API
+    const fetchAssignees = async () => {
+      try {
+        const response = await fetch("https://localhost:44346/api/users");
+        if (!response.ok) throw new Error("Failed to fetch assignees");
+
+        const data = await response.json();
+        setAssignees(data);
+      } catch (error) {
+        console.error("Error fetching assignees:", error);
+      }
+    };
+
+    fetchAssignees();
+  }, []);
 
   const handleChange = (e) => {
     setTask({ ...task, [e.target.name]: e.target.value });
   };
 
   const handleFileChange = (e) => {
-    setTask({ ...task, uploadDocument: e.target.files[0] });
+    setTask({ ...task, uploadedDocs: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
@@ -30,14 +49,16 @@ const AssignTask = () => {
     formData.append('category', task.category);
     formData.append('description', task.description);
     formData.append('assignor', task.assignor);
-    if (task.uploadDocument) {
-      formData.append('uploadDocument', task.uploadDocument);
+    if (task.uploadedDocs) {
+      formData.append('uploadedDocs', task.uploadedDocs);
     }
 
     try {
-      const response = await fetch('https://your-api-url/api/tasks', {
+      const response = await fetch('https://localhost:44346/api/tasks/add', {
         method: 'POST',
-        body: formData, // Using FormData to handle file uploads
+        // headers: {
+          // 'Content-Type': 'application/json',        
+        body: formData,
       });
 
       if (response.ok) {
@@ -49,7 +70,7 @@ const AssignTask = () => {
           category: '',
           description: '',
           assignor: '',
-          uploadDocument: null,
+          uploadedDocs: null,
         });
       } else {
         alert('Error assigning task!');
@@ -84,9 +105,19 @@ const AssignTask = () => {
                name="assignee"
                value={task.assignee}
                onChange={handleChange}
-               required
+              //  required
                >
               <option value="">Select Assignee</option>
+                {assignees.length > 0 ? (
+                  assignees.map((user, index) => (
+                    <option key={user.UserID} value={user.UserID}>
+                      {user.FirstName} {user.LastName}
+              </option>
+          ))
+        ) : (
+          <option disabled>Loading assignees...</option>
+        )}
+
              </Form.Select>
             </Form.Group>
 
@@ -142,7 +173,7 @@ const AssignTask = () => {
               <Form.Label>Upload Document</Form.Label>
               <Form.Control
                 type="file"
-                name="uploadDocument"
+                name="uploadedDocs"
                 onChange={handleFileChange}
                 accept="*/*" // Allows all file formats
               />

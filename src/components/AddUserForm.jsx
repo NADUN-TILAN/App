@@ -6,11 +6,13 @@ const AddUserForm = () => {
       firstName: '',
       middleName: '',
       lastName: '',
+      department: '',
       dob: '',
       address: '',
       country: '',
       contactNo: '',
-      email: ''
+      email: '',
+      verifyEmail: ''
     });
   
     const handleChange = (e) => {
@@ -19,30 +21,49 @@ const AddUserForm = () => {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-  
+      
+      if (user.email !== user.verifyEmail) {
+        alert('Emails do not match!');
+        return;
+      }
+
       try {
-        const response = await fetch('https://your-api-url/api/user', {
+        const response = await fetch('https://localhost:44346/api/users/add', { // Ensure correct API URL
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(user),
+          body: JSON.stringify({
+            firstName: user.firstName,
+            middleName: user.middleName,
+            lastName: user.lastName,
+            department: user.department,
+            dob: user.dob,
+            address: user.address,
+            country: user.country,
+            contactNo: user.contactNo,
+            email: user.email
+          }),
         });
   
+        const data = await response.json();
+  
         if (response.ok) {
-          alert('User created successfully!');
+          alert(data.message || 'User created successfully!');
           setUser({
             firstName: '',
             middleName: '',
             lastName: '',
+            department: '',
             dob: '',
             address: '',
             country: '',
             contactNo: '',
-            email: ''
+            email: '',
+            verifyEmail: ''
           });
         } else {
-          alert('Error creating user!');
+          alert(data.message || 'Error creating user!');
         }
       } catch (error) {
         console.error('Error:', error);
@@ -112,6 +133,22 @@ const AddUserForm = () => {
                   </Form.Group>
                 </Col>
               </Row>
+
+              <Row>
+                <Col md={12}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Department</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="department"
+                      placeholder="Enter Department"
+                      value={user.department}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
   
               <Form.Group className="mb-3">
                 <Form.Label>Address</Form.Label>
@@ -155,7 +192,7 @@ const AddUserForm = () => {
                 </Col>
               </Row>
   
-             <Row>
+              <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Email</Form.Label>
@@ -168,21 +205,22 @@ const AddUserForm = () => {
                       required
                     />
                   </Form.Group>
-                </Col>                
+                </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Verify Email</Form.Label>
                     <Form.Control
                       type="email"
-                      name="email"
+                      name="verifyEmail"
                       placeholder="Re-enter email"
-                      value={user.email}
+                      value={user.verifyEmail}
                       onChange={handleChange}
                       required
                     />
                   </Form.Group>
                 </Col>
-                </Row>
+              </Row> 
+                
               <div className="text-center">
                 <Button variant="primary" type="submit">
                   Submit
