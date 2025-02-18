@@ -1,28 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Container, Row, Col } from "react-bootstrap";
 
 const AssignTask = () => {
   const [task, setTask] = useState({
-    title: '',
-    assignee: '',
-    dueDate: '',
-    category: '',
-    description: '',
-    assignor: '',
+    title: "",
+    assignee: "",
+    dueDate: "",
+    category: "",
+    description: "",
+    assignor: "",
     uploadedDocs: null,
   });
 
-  const [assignees, setAssignees] = useState([]);
+  const [assignee, setAssignee] = useState([]);
 
   useEffect(() => {
     // Fetch assignees from API
     const fetchAssignees = async () => {
       try {
-        const response = await fetch("https://localhost:44346/api/users");
+        const response = await fetch(
+          "https://localhost:44346/api/users/assignees"
+        );
         if (!response.ok) throw new Error("Failed to fetch assignees");
 
         const data = await response.json();
-        setAssignees(data);
+        setAssignee(data);
       } catch (error) {
         console.error("Error fetching assignees:", error);
       }
@@ -36,48 +38,57 @@ const AssignTask = () => {
   };
 
   const handleFileChange = (e) => {
-    setTask({ ...task, uploadedDocs: e.target.files[0] });
+    const file = e.target.files[0];
+    if (file && file.size > 0) {
+      // Validate file type (PDF, PNG, or JPEG)
+      if (!['application/pdf', 'image/png', 'image/jpeg'].includes(file.type)) {
+        alert('Invalid file type. Only PDF, PNG, and JPEG are allowed.');
+        return;
+      }
+      setTask({ ...task, uploadedDocs: file });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append('title', task.title);
-    formData.append('assignee', task.assignee);
-    formData.append('dueDate', task.dueDate);
-    formData.append('category', task.category);
-    formData.append('description', task.description);
-    formData.append('assignor', task.assignor);
+    formData.append("title", task.title);
+    formData.append("assignee", task.assignee);
+    formData.append("dueDate", task.dueDate);
+    formData.append("category", task.category);
+    formData.append("description", task.description);
+    formData.append("assignor", task.assignor);
     if (task.uploadedDocs) {
-      formData.append('uploadedDocs', task.uploadedDocs);
+      formData.append("uploadedDocs", task.uploadedDocs);
     }
 
     try {
-      const response = await fetch('https://localhost:44346/api/tasks/add', {
-        method: 'POST',
-        // headers: {
-          // 'Content-Type': 'application/json',        
-        body: formData,
+      const response = await fetch("https://localhost:44346/api/tasks/add", {
+        // insert api
+        method: "POST",
+        body: formData, 
+      headers: {
+      },
       });
 
       if (response.ok) {
-        alert('Task assigned successfully!');
+        alert("Task assigned successfully!");
         setTask({
-          title: '',
-          assignee: '',
-          dueDate: '',
-          category: '',
-          description: '',
-          assignor: '',
+          title: "",
+          assignee: "",
+          dueDate: "",
+          category: "",
+          description: "",
+          assignor: "",
           uploadedDocs: null,
         });
       } else {
-        alert('Error assigning task!');
+        alert("Error assigning task!");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error assigning task!');
+      console.error("Error:", error);
+      alert("Error assigning task!");
     }
   };
 
@@ -98,27 +109,26 @@ const AssignTask = () => {
                 required
               />
             </Form.Group>
-     
-           <Form.Group className="mb-3">
-            <Form.Label>Assignee</Form.Label>
-            <Form.Select
-               name="assignee"
-               value={task.assignee}
-               onChange={handleChange}
-              //  required
-               >
-              <option value="">Select Assignee</option>
-                {assignees.length > 0 ? (
-                  assignees.map((user, index) => (
-                    <option key={user.UserID} value={user.UserID}>
-                      {user.FirstName} {user.LastName}
-              </option>
-          ))
-        ) : (
-          <option disabled>Loading assignees...</option>
-        )}
 
-             </Form.Select>
+            <Form.Group className="mb-3">
+              <Form.Label>Assignee</Form.Label>
+              <Form.Select
+                name="assignee"
+                value={task.assignee}
+                onChange={handleChange}
+                disabled={assignee.length === 0} // Disable until assignees are fetched
+              >
+                <option value="">Select Assignee</option>
+                {assignee.length > 0 ? (
+                  assignee.map((user) => (
+                    <option key={user.UserID} value={user.UserID}>
+                      {user.Assignee}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>Loading assignees...</option>
+                )}
+              </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">
