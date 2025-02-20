@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 
-const TaskList = () => {
+const AssignTasksMonitoring = () => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     // Make sure this URL matches the correct API endpoint
-    fetch("https://localhost:44346/api/tasks/informations")
+    fetch("http://localhost:5000/api/tasks/informations")
       .then((res) => res.json())  // Parse JSON response
       .then((data) => setTasks(data))  // Store data in state
       .catch((error) => console.error("Error fetching tasks:", error));  // Handle errors
@@ -23,8 +23,6 @@ const TaskList = () => {
             <th>Assignee</th>
             <th>Due Date</th>
             <th>Category</th>
-            <th>Description</th>
-            <th>Assignor</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -38,8 +36,6 @@ const TaskList = () => {
                 <td>{task.Assignee}</td>
                 <td>{task.DueDate ? task.DueDate : "No due date"}</td>
                 <td>{task.Category}</td>
-                <td>{task.Description}</td>
-                <td>{task.Assignor}</td>
                 <td>{task.Status ? task.Status : "Pending"}</td>
                 <td>
                   <Button variant="success" size="sm">
@@ -50,7 +46,7 @@ const TaskList = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center">No tasks available</td>
+              <td colSpan="7" className="text-center">No tasks available</td>
             </tr>
           )}
         </tbody>
@@ -59,4 +55,4 @@ const TaskList = () => {
   );
 };
 
-export default TaskList;
+export default AssignTasksMonitoring;
