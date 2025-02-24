@@ -1,20 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button } from "react-bootstrap";
+import { Table, Button, Container, Form } from "react-bootstrap";
 
 const AssignTasksMonitoring = () => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    // Make sure this URL matches the correct API endpoint
-    fetch("http://localhost:5000/api/tasks/informations")
-      .then((res) => res.json())  // Parse JSON response
-      .then((data) => setTasks(data))  // Store data in state
-      .catch((error) => console.error("Error fetching tasks:", error));  // Handle errors
-  }, []); // Empty dependency array ensures this runs once when the component mounts
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch("https://localhost:44346/api/tasks/informations");
+      if (!response.ok) throw new Error("Failed to fetch tasks");
+
+      const data = await response.json();
+      console.log("Fetched tasks:", data);
+      setTasks(data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      try {
+        const response = await fetch(`https://localhost:44346/api/tasks/${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          setTasks((prevTasks) => prevTasks.filter((task) => task.TaskID !== id));
+        } else {
+          alert("Error deleting task!");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
 
   return (
-    <div className="container mt-4">
-      <h2 className="text-center mb-4">List of Assigned Tasks</h2>
+    <Container className="mt-4">
+      <h2 className="text-center mb-4">Task Monitoring</h2>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -23,6 +50,9 @@ const AssignTasksMonitoring = () => {
             <th>Assignee</th>
             <th>Due Date</th>
             <th>Category</th>
+            <th>Description</th>
+            <th>Assignor</th>
+            <th>Uploaded Docs</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -36,22 +66,38 @@ const AssignTasksMonitoring = () => {
                 <td>{task.Assignee}</td>
                 <td>{task.DueDate ? task.DueDate : "No due date"}</td>
                 <td>{task.Category}</td>
-                <td>{task.Status ? task.Status : "Pending"}</td>
+                <td>{task.Description}</td>
+                <td>{task.Assignor}</td>
+                <td>{task.UploadedDocs ? "Yes" : "No"}</td>
                 <td>
-                  <Button variant="success" size="sm">
-                    Complete
+                  <Form.Select defaultValue={task.Status || "Pending"}>
+                    <option value="Pending">Pending</option>
+                    <option value="Assigned">Assigned</option>
+                  </Form.Select>
+                </td>
+                <td>
+                  <Button variant="info" className="me-2" href={`/task/${task.TaskID}`}>
+                    Read
+                  </Button>
+                  <Button variant="warning" className="me-2" href={`/edit-task/${task.TaskID}`}>
+                    Update
+                  </Button>
+                  <Button variant="danger" onClick={() => handleDelete(task.TaskID)}>
+                    Delete
                   </Button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="text-center">No tasks available</td>
+              <td colSpan="10" className="text-center">
+                No data available
+              </td>
             </tr>
           )}
         </tbody>
       </Table>
-    </div>
+    </Container>
   );
 };
 
