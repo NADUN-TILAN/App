@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button } from "react-bootstrap";
+import { Table, Button, Container, Row, Col } from "react-bootstrap";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -13,9 +13,25 @@ const TaskList = () => {
   }, []); // Empty dependency array ensures this runs once when the component mounts
 
   return (
-    <div className="container mt-4">
+    <Container className="mt-4">
+      {/* Enhanced Page Header */}
+      <div className="page-header">
+        <Row className="align-items-center">
+          <Col md={12}>
+            <ul className="breadcrumb">
+              <li>
+                <a href="index.html">Task /</a>
+              </li>
+              <li>Task List</li>
+            </ul>
+            <h1 className="dashboard-title">Assigned Task List</h1>
+          </Col>
+        </Row>
+      </div>
+
+      {/* Task Table */}
       <h2 className="text-center mb-4">List of Assigned Tasks</h2>
-      <Table striped bordered hover>
+      <Table striped bordered hover responsive>
         <thead>
           <tr>
             <th>#</th>
@@ -50,12 +66,14 @@ const TaskList = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center">No tasks available</td>
+              <td colSpan="9" className="text-center">
+                No tasks available
+              </td>
             </tr>
           )}
         </tbody>
       </Table>
-    </div>
+    </Container>
   );
 };
 

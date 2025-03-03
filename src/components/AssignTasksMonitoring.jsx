@@ -41,8 +41,20 @@ const AssignTasksMonitoring = () => {
 
   return (
     <Container className="mt-4">
-      <h2 className="text-center mb-4">Task Monitoring</h2>
-      <Table striped bordered hover>
+      {/* Page Header */}
+      <div className="page-header">
+        <Container>
+          <ul className="breadcrumb">
+            <li>
+              <a href="index.html">Home /</a>
+            </li>
+            <li>Task Panel</li>
+          </ul>
+          <h1 className="dashboard-title">Task Monitoring</h1>
+        </Container>
+      </div>
+
+      <Table striped bordered hover responsive>
         <thead>
           <tr>
             <th>#</th>
@@ -76,13 +88,24 @@ const AssignTasksMonitoring = () => {
                   </Form.Select>
                 </td>
                 <td>
-                  <Button variant="info" className="me-2" href={`/task/${task.TaskID}`}>
+                  <Button
+                    variant="info"
+                    className="me-2"
+                    href={`/task/${task.TaskID}`}
+                  >
                     Read
                   </Button>
-                  <Button variant="warning" className="me-2" href={`/edit-task/${task.TaskID}`}>
+                  <Button
+                    variant="warning"
+                    className="me-2"
+                    href={`/edit-task/${task.TaskID}`}
+                  >
                     Update
                   </Button>
-                  <Button variant="danger" onClick={() => handleDelete(task.TaskID)}>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(task.TaskID)}
+                  >
                     Delete
                   </Button>
                 </td>

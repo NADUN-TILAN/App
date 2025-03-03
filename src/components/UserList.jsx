@@ -42,7 +42,20 @@ const UserList = () => {
 
   return (
     <Container className="mt-4">
-      <h2 className="text-center mb-4">List of Employers</h2>
+      {/* Page Header */}
+      <div className="page-header">
+        <Container>
+        <ul className="breadcrumb">
+              <li>
+                <a href="index.html">User /</a>
+              </li>
+              <li>User List</li>
+            </ul>
+          <h1 className="text-center mb-4">List of Employers</h1>
+        </Container>
+      </div>
+
+      {/* User Table */}
       <Table striped bordered hover>
         <thead>
           <tr>
