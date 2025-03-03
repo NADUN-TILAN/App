@@ -1,38 +1,159 @@
-.App {
+/* General Styling */
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header */
+h1 {
   text-align: center;
+  color: #343a40;
+  margin-top: 20px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Navigation */
+nav {
+  background-color: #343a40;
+  padding: 10px 20px;
+  border-radius: 0px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+nav ul {
+  list-style: none;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 15px;
+}
+
+nav ul li {
+  display: inline;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background 0.3s ease-in-out;
+}
+
+nav ul li a:hover {
+  background-color: #495057;
+}
+
+/* Container for Pages */
+/* .container {
+  margin-top: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+} */
+
+/* Button Styling */
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Table Styling */
+.table {
+  margin-top: 20px;
+}
+
+.table thead {
+  background-color: #343a40;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.table tbody tr:hover {
+  background-color: #f1f3f5;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Responsive Design */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    text-align: center;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .container {
+    padding: 15px;
+  }
+}
+
+/* Footer Styling */
+.footer {
+  background-color: #343a40; /* Dark background */
+  color: #f8f9fa; /* Light text */
+  padding: 40px 0; /* Padding for spacing */
+  font-size: 1rem;
+}
+
+.footer h5 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 20px; /* Space between heading and content */
+}
+
+.footer ul {
+  padding: 0;
+  list-style: none;
+}
+
+.footer ul li {
+  margin-bottom: 12px;
+}
+
+.footer ul li a {
+  color: #f8f9fa; /* Light text */
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+.footer ul li a:hover {
+  color: #17a2b8; /* Blue color on hover */
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.footer hr {
+  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Light horizontal line */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer {
+    padding: 20px 0;
+  }
+
+  .footer h5 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+
+  .footer ul {
+    text-align: center;
+  }
+
+  .footer ul li {
+    margin-bottom: 10px;
+  }
+
+  .footer p {
+    text-align: center;
   }
 }

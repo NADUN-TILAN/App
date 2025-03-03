@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import UserViewModel from "./viewmodels/UserViewModel";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
 
 import DashBoard from "./components/DashBoard";
 import AssignTasksMonitoring from "./components/AssignTasksMonitoring";
@@ -8,15 +10,14 @@ import UserList from "./components/UserList";
 import AddUserForm from "./components/AddUserForm";
 import AssignTasks from "./components/AssignTasks";
 import TaskList from "./components/TaskList";
+import Footer from "./components/Footer"; 
 
 const App = () => {
-  const { handleusers, handleAddUser, handleAssignTasks, handleDashboard, handleassignTasksMonitoring} = UserViewModel();
+  const { handleusers, handleAddUser, handleAssignTasks, handleDashboard, handleassignTasksMonitoring } = UserViewModel();
 
   return (
     <Router>
       <div>
-        <h1>Management App</h1>
-
         {/* Navigation Links */}
         <nav>
           <ul>
@@ -30,7 +31,7 @@ const App = () => {
         </nav>
 
         {/* Routes */}
-          <Routes>
+        <Routes>
           <Route path="/DashBoard" element={<DashBoard DashBoard={handleDashboard} />} />
           <Route path="/assign-task" element={<AssignTasksMonitoring assignTasksMonitoring={handleassignTasksMonitoring} />} /> 
           <Route path="/user-list" element={<UserList users={handleusers} />} /> 
@@ -39,6 +40,9 @@ const App = () => {
           <Route path="/tasks" element={<TaskList />} />
         </Routes>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </Router>
   );
 };
