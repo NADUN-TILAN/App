@@ -30,7 +30,7 @@ const TaskList = () => {
       </div>
 
       {/* Task Table */}
-      <h2 className="text-center mb-4">List of Assigned Tasks</h2>
+      {/* <h2 className="text-center mb-4">List of Assigned Tasks</h2> */}
       <Table striped bordered hover responsive>
         <thead>
           <tr>
