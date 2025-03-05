@@ -54,7 +54,7 @@ const App = () => {
         <Routes>
           <Route path="/DashBoard" element={<DashBoard DashBoard={handleDashboard} />} />
           <Route path="/assign-task" element={<AssignTasksMonitoring assignTasksMonitoring={handleassignTasksMonitoring} />} />
-          <Route path="/user-list" element={<UserList users={handleusers} />} />
+          {/* <Route path="/user-list" element={<UserList users={handleusers} />} /> */}
           <Route path="/add-user" element={<AddUserForm onAddUser={handleAddUser} />} />
           <Route path="/add-tasks" element={<AssignTasks assignTasks={handleAssignTasks} />} />
           <Route path="/tasks" element={<TaskList />} />

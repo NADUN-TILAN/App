@@ -104,3 +104,30 @@ body {
       padding: 15px;
   }
 }
+
+/* User Profile Card Styling */
+.user-profile-card {
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.user-profile-img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.user-email {
+  font-size: 1rem;
+}
+
+.user-contact {
+  font-size: 1rem;
+  margin-top: 10px;
+}
