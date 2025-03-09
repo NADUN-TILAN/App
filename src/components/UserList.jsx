@@ -25,12 +25,12 @@ const UserList = () => {
       console.error("Error fetching users:", error);
     }
   };
-
-  const handleDelete = async (id) => {
+//delete
+  const handleDelete = async (id, firstName, lastName) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         const response = await fetch(
-          `https://localhost:44346/api/users/${id}`,
+          `https://localhost:44346/api/users/${id}/${firstName}/${lastName}`,
           {
             method: "DELETE",
           }
@@ -90,23 +90,30 @@ const UserList = () => {
                 <td>{user.Email}</td>
                 <td>{user.ContactNo}</td>
                 <td>
+                  
                   <Button
                     variant="info"
                     className="me-2"
-                    onClick={() => navigate(`/user/${user.UserID}`)}
+                    onClick={() =>
+                      navigate(`/user/details/${user.UserID}/${user.FirstName}/${user.LastName}`)
+                    } // Updated URL format
                   >
                     Read
                   </Button>
+
                   <Button
                     variant="warning"
                     className="me-2"
-                    onClick={() => navigate(`/edit-user/${user.UserID}`)}
+                    onClick={() => navigate(`/edit-user/${user.UserID}`)                      
+                    }
                   >
                     Update
                   </Button>
                   <Button
                     variant="danger"
-                    onClick={() => handleDelete(user.UserID)}
+                    onClick={() =>
+                      handleDelete(user.UserID, user.FirstName, user.LastName)
+                    }
                   >
                     Delete
                   </Button>

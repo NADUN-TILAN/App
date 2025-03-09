@@ -30,21 +30,19 @@ const App = () => {
               <Nav className="me-auto">
                 <Nav.Link as={Link} to="/DashBoard">Dashboard</Nav.Link>
                 <Nav.Link as={Link} to="/assign-task">Assign Task</Nav.Link>
-                {/* <Nav.Link as={Link} to="/user-list">View User</Nav.Link> */}
 
                 {/* Dropdown 1 for Task Management */}
                 <NavDropdown title="Users" id="task-dropdown">
                   <NavDropdown.Item as={Link} to="/add-user">Add User</NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/user-list">View User</NavDropdown.Item>
-                  {/* <NavDropdown.Item as={Link} to="/tasks">View Task</NavDropdown.Item> */}
                 </NavDropdown>
 
                 {/* Dropdown 2 for Task Management */}
                 <NavDropdown title="Tasks" id="task-dropdown">
-                  {/* <NavDropdown.Item as={Link} to="/assign-task">Assign Task</NavDropdown.Item> */}
                   <NavDropdown.Item as={Link} to="/add-tasks">Add Task</NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/tasks">View Task</NavDropdown.Item>
                 </NavDropdown>
+
               </Nav>
             </Navbar.Collapse>
           </Container>
@@ -54,12 +52,11 @@ const App = () => {
         <Routes>
           <Route path="/DashBoard" element={<DashBoard DashBoard={handleDashboard} />} />
           <Route path="/assign-task" element={<AssignTasksMonitoring assignTasksMonitoring={handleassignTasksMonitoring} />} />
-          {/* <Route path="/user-list" element={<UserList users={handleusers} />} /> */}
           <Route path="/add-user" element={<AddUserForm onAddUser={handleAddUser} />} />
           <Route path="/add-tasks" element={<AssignTasks assignTasks={handleAssignTasks} />} />
           <Route path="/tasks" element={<TaskList />} />
-          <Route path="/user/:id" element={<UserDetails />} />
-          <Route path="/edit-user/:id" element={<EditUser />} />
+          <Route path="/user/:id/:firstname/:lastname" element={<UserDetails />} />
+          <Route path="/edit-user/id" element={<EditUser />} />
           <Route path="/user-list" element={<UserList users={handleusers} onDelete={handleDelete} />} />
         </Routes>
       </div>

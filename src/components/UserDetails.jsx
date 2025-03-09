@@ -3,55 +3,49 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
 
 const UserDetails = () => {
-  const { id } = useParams();  
+  const { id, firstname, lastname } = useParams();  
   const navigate = useNavigate();  
-  const [user, setUser] = useState(null);  
-  const [loading, setLoading] = useState(true);  // Loading state
-  const [error, setError] = useState(null);  // Error state
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);  
+  const [error, setError] = useState(null);  
 
   useEffect(() => {
-    // Function to fetch user details from the backend API
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch(`https://localhost:44346/api/users/${id}`);  // Fetch data by user ID
+        // Ensure the API URL matches your backend route
+        const response = await fetch(`https://localhost:44346/api/users/details/${id}/${firstname}/${lastname}`);
+        
         if (!response.ok) {
           throw new Error("Failed to fetch user details");
         }
-        const data = await response.json();  // Parse the JSON response
 
-        // Check if the expected data exists
-        if (data) {
-          setUser({
-            FirstName: data.FirstName || "N/A",
-            MiddleName: data.MiddleName || "N/A",
-            LastName: data.LastName || "N/A",
-            Email: data.Email || "N/A",
-            ContactNo: data.ContactNo || "N/A",
-          });
-        } else {
-          throw new Error("User not found");
+        const data = await response.json();
+        console.log("User Data:", data); // Debugging API response
+
+        if (!data || Object.keys(data).length === 0) {
+          throw new Error("User not found or empty response.");
         }
+
+        setUser(data);
       } catch (error) {
-        setError(error.message);  // Set error message if fetch fails
+        setError(error.message);
       } finally {
-        setLoading(false);  // Set loading to false after fetching data
+        setLoading(false);
       }
     };
 
-    fetchUserDetails();  // Call the function to fetch data
-  }, [id]);  // Only re-run when the user ID changes
+    fetchUserDetails();
+  }, [id, firstname, lastname]);
 
-  // If data is still loading
   if (loading) {
     return (
-      <Container className="mt-4" style={{ textAlign: "center" }}>
+      <Container className="mt-4 text-center">
         <Spinner animation="border" variant="primary" />
-        <p>Loading...</p>
+        <p>Loading user details...</p>
       </Container>
     );
   }
 
-  // If there was an error fetching the data
   if (error) {
     return (
       <Container className="mt-4">
@@ -62,18 +56,16 @@ const UserDetails = () => {
     );
   }
 
-  // If no user data is found or incomplete data
-  if (!user || !user.FirstName || !user.LastName || !user.Email || !user.ContactNo) {
+  if (!user) {
     return (
       <Container className="mt-4">
         <Alert variant="warning">
-          <p>No user data available or incomplete user data.</p>
+          <p>No user details found.</p>
         </Alert>
       </Container>
     );
   }
 
-  // Render the user details when data is successfully fetched
   return (
     <Container className="mt-4">
       <Row className="justify-content-center">
@@ -83,22 +75,23 @@ const UserDetails = () => {
               <div className="text-center mb-3">
                 <Card.Img
                   variant="top"
-                  src="https://via.placeholder.com/150"
-                  className="rounded-circle user-profile-img"
+                  src="https://via.placeholder.com/150" // Replace with actual user image URL if available
+                  className="rounded-circle"
+                  style={{ width: "100px", height: "100px" }}
                 />
               </div>
-              <Card.Title className="text-center user-name">
-                {`${user.FirstName} ${user.MiddleName} ${user.LastName}`}
-              </Card.Title>
-              <Card.Text className="text-center text-muted user-email">
-                {user.Email}
-              </Card.Text>
-              <Card.Text className="text-center user-contact">
-                Contact No: {user.ContactNo}
-              </Card.Text>
-              <div className="d-flex justify-content-center">
+              <h3 className="text-center">{`${user.firstName} ${user.lastName}`}</h3>
+              <p className="text-center text-muted">{user.email}</p>
+              <hr />
+              <p>
+                <strong>Middle Name:</strong> {user.middleName || "N/A"}
+              </p>
+              <p>
+                <strong>Contact No:</strong> {user.contactNo || "N/A"}
+              </p>
+              <div className="text-center mt-3">
                 <Button variant="secondary" onClick={() => navigate(-1)}>
-                  Go Back
+                  Back
                 </Button>
               </div>
             </Card.Body>
