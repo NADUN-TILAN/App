@@ -95,7 +95,7 @@ const UserList = () => {
                     variant="info"
                     className="me-2"
                     onClick={() =>
-                      navigate(`/user/details/${user.UserID}/${user.FirstName}/${user.LastName}`)
+                      navigate(`/read-user/${user.UserID}/${user.FirstName}/${user.LastName}`)
                     } // Updated URL format
                   >
                     Read

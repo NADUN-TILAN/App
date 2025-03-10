@@ -2,17 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
 
-const UserDetails = () => {
-  const { id, firstname, lastname } = useParams();  
-  const navigate = useNavigate();  
+const ReadUser = () => {
+  const { id, firstname, lastname } = useParams();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);  
-  const [error, setError] = useState(null);  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
+    const fetchReadUser = async () => {
       try {
-        // Ensure the API URL matches your backend route
+        console.log(`Fetching User: ID=${id}, FirstName=${firstname}, LastName=${lastname}`);
+
         const response = await fetch(`https://localhost:44346/api/users/details/${id}/${firstname}/${lastname}`);
         
         if (!response.ok) {
@@ -20,22 +21,28 @@ const UserDetails = () => {
         }
 
         const data = await response.json();
-        console.log("User Data:", data); // Debugging API response
+        console.log("API Response Data:", data); // Debugging API response
 
-        if (!data || Object.keys(data).length === 0) {
+        if (!Array.isArray(data) || data.length === 0) {
           throw new Error("User not found or empty response.");
         }
 
-        setUser(data);
+        // Extract the first user from the array
+        setUser(data[0]);
       } catch (error) {
+        console.error("Fetch Error:", error);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserDetails();
+    fetchReadUser();
   }, [id, firstname, lastname]);
+
+  useEffect(() => {
+    console.log("Updated User State:", user);
+  }, [user]);
 
   if (loading) {
     return (
@@ -75,19 +82,19 @@ const UserDetails = () => {
               <div className="text-center mb-3">
                 <Card.Img
                   variant="top"
-                  src="https://via.placeholder.com/150" // Replace with actual user image URL if available
+                  src="https://www.shutterstock.com/image-vector/user-icon-trendy-flat-style-600nw-418179856.jpg" 
                   className="rounded-circle"
                   style={{ width: "100px", height: "100px" }}
                 />
               </div>
-              <h3 className="text-center">{`${user.firstName} ${user.lastName}`}</h3>
-              <p className="text-center text-muted">{user.email}</p>
+              <h3 className="text-center">{user?.FirstName ?? "N/A"} {user?.LastName ?? "N/A"}</h3>
+              <p className="text-center text-muted">{user?.Email ?? "N/A"}</p>
               <hr />
               <p>
-                <strong>Middle Name:</strong> {user.middleName || "N/A"}
+                <strong>Middle Name:</strong> {user?.MiddleName ?? "N/A"}
               </p>
               <p>
-                <strong>Contact No:</strong> {user.contactNo || "N/A"}
+                <strong>Contact No:</strong> {user?.ContactNo ?? "N/A"}
               </p>
               <div className="text-center mt-3">
                 <Button variant="secondary" onClick={() => navigate(-1)}>
@@ -102,4 +109,4 @@ const UserDetails = () => {
   );
 };
 
-export default UserDetails;
+export default ReadUser;
