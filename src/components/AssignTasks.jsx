@@ -1,37 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Card } from "react-bootstrap";
 
 const AssignTask = () => {
   const [task, setTask] = useState({
     title: "",
-    assignee: "",
+    // assignee: "",
     dueDate: "",
     category: "",
     description: "",
-    assignor: "",
+    // assignor: "",
     uploadedDocs: null,
   });
 
-  const [assignee, setAssignee] = useState([]);
+  // const [assignee, setAssignee] = useState([]);
 
-  useEffect(() => {
-    // Fetch assignees from API
-    const fetchAssignees = async () => {
-      try {
-        const response = await fetch(
-          "https://localhost:44346/api/users/assignees"
-        );
-        if (!response.ok) throw new Error("Failed to fetch assignees");
+  // useEffect(() => {
+  //   // Fetch assignees from API
+  //   const fetchAssignees = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "https://localhost:44346/api/users/assignees"
+  //       );
+  //       if (!response.ok) throw new Error("Failed to fetch assignees");
 
-        const data = await response.json();
-        setAssignee(data);
-      } catch (error) {
-        console.error("Error fetching assignees:", error);
-      }
-    };
+  //       const data = await response.json();
+  //       setAssignee(data);
+  //     } catch (error) {
+  //       console.error("Error fetching assignees:", error);
+  //     }
+  //   };
 
-    fetchAssignees();
-  }, []);
+  //   fetchAssignees();
+  // }, []);
 
   const handleChange = (e) => {
     setTask({ ...task, [e.target.name]: e.target.value });
@@ -54,7 +54,7 @@ const AssignTask = () => {
 
     const formData = new FormData();
     formData.append("title", task.title);
-    formData.append("assignee", task.assignee);
+    // formData.append("assignee", task.assignee);
     formData.append("dueDate", task.dueDate);
     formData.append("category", task.category);
     formData.append("description", task.description);
@@ -75,11 +75,11 @@ const AssignTask = () => {
         alert("Task assigned successfully!");
         setTask({
           title: "",
-          assignee: "",
+          // assignee: "",
           dueDate: "",
           category: "",
           description: "",
-          assignor: "",
+          // assignor: "",
           uploadedDocs: null,
         });
       } else {
@@ -114,7 +114,7 @@ const AssignTask = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3">
+                {/* <Form.Group className="mb-3">
                   <Form.Label>Assignee</Form.Label>
                   <Form.Select
                     name="assignee"
@@ -133,7 +133,7 @@ const AssignTask = () => {
                       <option disabled>Loading assignees...</option>
                     )}
                   </Form.Select>
-                </Form.Group>
+                </Form.Group> */}
 
                 <Form.Group className="mb-3">
                   <Form.Label>Due Date</Form.Label>
@@ -171,7 +171,7 @@ const AssignTask = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3">
+                {/* <Form.Group className="mb-3">
                   <Form.Label>Who is the Assignor</Form.Label>
                   <Form.Control
                     type="text"
@@ -181,7 +181,7 @@ const AssignTask = () => {
                     onChange={handleChange}
                     required
                   />
-                </Form.Group>
+                </Form.Group> */}
 
                 <Form.Group className="mb-3">
                   <Form.Label>Upload Document</Form.Label>

@@ -12,8 +12,11 @@ import AddUserForm from "./components/AddUserForm";
 import AssignTasks from "./components/AssignTasks";
 import TaskList from "./components/TaskList";
 import Footer from "./components/Footer";
+
 import ReadUser from "./components/UserDetails"; 
 import EditUser from "./components/EditUser"; 
+
+import TaskDetails from "./components/TaskDetails";
 
 const App = () => {
   const { handleusers, handleAddUser, handleAssignTasks, handleDashboard, handleassignTasksMonitoring, handleDelete } = UserViewModel();
@@ -58,6 +61,8 @@ const App = () => {
           <Route path="/read-user/:id/:firstname/:lastname" element={<ReadUser />} />
           <Route path="/edit-user/:id" element={<EditUser />} />
           <Route path="/user-list" element={<UserList users={handleusers} onDelete={handleDelete} />} />
+
+          <Route path="/read-task/:id" element={<TaskDetails />} />
         </Routes>
       </div>
 
