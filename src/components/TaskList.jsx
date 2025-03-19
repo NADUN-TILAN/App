@@ -1,57 +1,87 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Container, Row, Col } from "react-bootstrap";
+import { Table, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
-  const navigate = useNavigate(); // For navigation
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch tasks from the API
-    fetch("https://localhost:44346/api/tasks/informations")
-      .then((res) => res.json())  // Parse JSON response
-      .then((data) => setTasks(data))  // Store data in state
-      .catch((error) => console.error("Error fetching tasks:", error));  // Handle errors
-  }, []); // Empty dependency array ensures this runs once when the component mounts
+    fetchTasks();
+  }, []);
 
-  const handleUpdate = (task) => {
-    // Logic for updating the task (e.g., open a form to edit the task)
-    alert(`Updating task: ${task.Title}`);
-    // You can implement the logic to show a modal or redirect to an edit page
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch("https://localhost:44346/api/tasks/informations", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch tasks");
+
+      const data = await response.json();
+      console.log("Fetched tasks:", data);
+      setTasks(data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      setError(error.message);
+    }
   };
 
-  const handleDelete = (taskId) => {
-    // Logic for deleting the task
+  const handleDelete = async (id) => {
+    if (!id) {
+      console.error("Task ID is undefined");
+      return;
+    }
+
     if (window.confirm("Are you sure you want to delete this task?")) {
-      fetch(`https://localhost:44346/api/tasks/${taskId}`, {
-        method: "DELETE",
-      })
-        .then((response) => response.json())
-        .then(() => {
-          setTasks(tasks.filter((task) => task.TaskID !== taskId)); // Remove task from state
-        })
-        .catch((error) => console.error("Error deleting task:", error));
+      try {
+        console.log(`Deleting task with ID: ${id}`);
+
+        const response = await fetch(`https://localhost:44346/api/tasks/details/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(`Error deleting task: ${errorMsg}`);
+        }
+
+        setTasks((prevTasks) => prevTasks.filter((task) => task.TaskID !== id));
+      } catch (error) {
+        console.error("Error:", error);
+        setError("Something went wrong while deleting the task.");
+      }
     }
   };
 
   return (
     <Container className="mt-4">
-      {/* Enhanced Page Header */}
       <div className="page-header">
         <Row className="align-items-center">
           <Col md={12}>
             <ul className="breadcrumb">
               <li>
-                <a href="index.html">Task /</a>
+                <a href="/">Task</a> / Task List
               </li>
-              <li>Task List</li>
             </ul>
             <h1 className="dashboard-title">Assigned Task List</h1>
           </Col>
         </Row>
       </div>
 
-      {/* Task Table */}
+      {error && (
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      )}
+
       <Table striped bordered hover responsive>
         <thead>
           <tr>
@@ -60,7 +90,6 @@ const TaskList = () => {
             <th>Due Date</th>
             <th>Category</th>
             <th>Description</th>
-            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -70,21 +99,31 @@ const TaskList = () => {
               <tr key={task.TaskID}>
                 <td>{index + 1}</td>
                 <td>{task.Title}</td>
-                <td>{task.DueDate ? task.DueDate : "No due date"}</td>
-                <td>{task.Category}</td>
-                <td>{task.Description}</td>
-                <td>{task.Status ? task.Status : "Pending"}</td>
+                <td>{task.DueDate ? new Date(task.DueDate).toLocaleDateString() : "No due date"}</td>
+                <td>{task.Category || "N/A"}</td>
+                <td>{task.Description || "N/A"}</td>
                 <td>
-                  <Button variant="info" size="sm" onClick={() =>
-                      navigate(`/read-task/${task.TaskID}`)
-                    }
-                     >
+                  <Button
+                    variant="info"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => navigate(`/read-task/${task.TaskID}`)}
+                  >
                     View
                   </Button>
-                  <Button variant="warning" size="sm" onClick={() => handleUpdate(task)} className="mx-2">
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => navigate(`/edit-task/${task.TaskID}`)}
+                  >
                     Update
                   </Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDelete(task.TaskID)}>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDelete(task.TaskID)}
+                  >
                     Delete
                   </Button>
                 </td>
@@ -92,7 +131,7 @@ const TaskList = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="text-center">
+              <td colSpan="6" className="text-center">
                 No tasks available
               </td>
             </tr>

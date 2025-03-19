@@ -1,0 +1,54 @@
+.modern-table th, .modern-table td {
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .modern-table thead {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .modern-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  .modern-table tbody tr:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+  }
+  
+  .modern-table .form-select {
+    width: 100%;
+  }
+  
+  .page-header .breadcrumb {
+    background: none;
+    padding: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+  
+  .page-header .breadcrumb a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .page-header .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  
+  .dashboard-title {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  button {
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+  }
+  
