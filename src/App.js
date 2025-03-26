@@ -70,8 +70,8 @@ const App = () => {
           <Route path="/edit-user/:id" element={<EditUser />} />
 
           {/* Task Routes */}
-          <Route path="/read-task/:id" element={<TaskDetails />} />
-          <Route path="/edit-task/:id" element={<EditTask />} />
+          <Route path="/read-task/:taskID/:category" element={<TaskDetails />} />
+          <Route path="/edit-task/:taskID" element={<EditTask />} />
         </Routes>
       </div>
 

@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Container, Row, Col, Alert } from "react-bootstrap";
+import { Table, Button, Container, Row, Col, Alert, Modal } from "react-bootstrap"; // Added Modal
 import { useNavigate } from "react-router-dom";
+import TaskDetailsModal from "./TaskDetails";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal state for delete confirmation
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,52 +17,74 @@ const TaskList = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch("https://localhost:44346/api/tasks/informations", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch("https://localhost:44346/api/tasks/informations");
 
-      if (!response.ok) throw new Error("Failed to fetch tasks");
+      if (!response.ok) {
+        throw new Error("Failed to fetch tasks");
+      }
 
       const data = await response.json();
       console.log("Fetched tasks:", data);
-      setTasks(data);
+
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("No tasks found or empty response.");
+      }
+
+      // Ensure TaskID is valid and fallback to a unique identifier if necessary
+      const tasksWithValidIDs = data.map((task, index) => ({
+        ...task,
+        TaskID: task.TaskID || index + 1, // Use index as fallback if TaskID is missing or zero
+      }));
+
+      setTasks(tasksWithValidIDs);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       setError(error.message);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!id) {
-      console.error("Task ID is undefined");
-      return;
-    }
-
-    if (window.confirm("Are you sure you want to delete this task?")) {
+  const handleDelete = async () => {
+    if (selectedTask) {
       try {
-        console.log(`Deleting task with ID: ${id}`);
-
-        const response = await fetch(`https://localhost:44346/api/tasks/details/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `https://localhost:44346/api/tasks/details/${selectedTask.TaskID}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           const errorMsg = await response.text();
           throw new Error(`Error deleting task: ${errorMsg}`);
         }
 
-        setTasks((prevTasks) => prevTasks.filter((task) => task.TaskID !== id));
+        setTasks((prevTasks) =>
+          prevTasks.filter((task) => task.TaskID !== selectedTask.TaskID)
+        );
+        setShowDeleteModal(false); // Close modal after successful deletion
       } catch (error) {
         console.error("Error:", error);
         setError("Something went wrong while deleting the task.");
       }
     }
+  };
+
+  const openDeleteModal = (task) => {
+    setSelectedTask(task);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setSelectedTask(null);
+  };
+
+  const handleViewTask = (taskID, category) => {
+    setSelectedTask({ taskID, category });
+    setShowModal(true);
   };
 
   return (
@@ -95,40 +121,43 @@ const TaskList = () => {
         </thead>
         <tbody>
           {tasks.length > 0 ? (
-            tasks.map((task, index) => (
-              <tr key={task.TaskID}>
-                <td>{index + 1}</td>
-                <td>{task.Title}</td>
-                <td>{task.DueDate ? new Date(task.DueDate).toLocaleDateString() : "No due date"}</td>
-                <td>{task.Category || "N/A"}</td>
-                <td>{task.Description || "N/A"}</td>
-                <td>
-                  <Button
-                    variant="info"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => navigate(`/read-task/${task.TaskID}`)}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => navigate(`/edit-task/${task.TaskID}`)}
-                  >
-                    Update
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDelete(task.TaskID)}
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))
+            tasks.map((task, index) => {
+              console.log("Task object:", task); // Debugging log
+              return (
+                <tr key={task.TaskID}>
+                  <td>{index + 1}</td>
+                  <td>{task.Title}</td>
+                  <td>{task.DueDate ? new Date(task.DueDate).toLocaleDateString() : "No due date"}</td>
+                  <td>{task.Category || "N/A"}</td>
+                  <td>{task.Description || "N/A"}</td>
+                  <td>
+                    <Button
+                      variant="info"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => handleViewTask(task.TaskID, task.Category)}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => navigate(`/edit-task/${task.TaskID}`)} // Updated Edit button
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => openDeleteModal(task)} // Open modal
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })
           ) : (
             <tr>
               <td colSpan="6" className="text-center">
@@ -138,6 +167,33 @@ const TaskList = () => {
           )}
         </tbody>
       </Table>
+      {selectedTask && (
+        <TaskDetailsModal
+          show={showModal}
+          onHide={() => setShowModal(false)}
+          taskID={selectedTask.taskID}
+          category={selectedTask.category}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={closeDeleteModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the task{" "}
+          <strong>{selectedTask?.Title}</strong>?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeDeleteModal}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Container, Form } from "react-bootstrap";
+import { Card, Button, Container, Form, Row, Col, Spinner, Collapse } from "react-bootstrap";
 import '../css/AssignTasksMonitoring.css'; // Import custom CSS styles
 
 const AssignTasksMonitoring = () => {
@@ -7,6 +7,7 @@ const AssignTasksMonitoring = () => {
   const [assignees, setAssignees] = useState([]);
   const [assignors, setAssignors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedTask, setExpandedTask] = useState(null); // Track expanded task
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +85,10 @@ const AssignTasksMonitoring = () => {
     );
   };
 
+  const toggleDetails = (taskId) => {
+    setExpandedTask((prev) => (prev === taskId ? null : taskId));
+  };
+
   return (
     <Container className="mt-4">
       {/* Page Header */}
@@ -100,105 +105,110 @@ const AssignTasksMonitoring = () => {
       </div>
 
       {loading ? (
-        <p>Loading tasks...</p>
+        <div className="text-center">
+          <Spinner animation="border" />
+          <p>Loading tasks...</p>
+        </div>
       ) : (
-        <Table striped bordered hover responsive className="modern-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Title</th>
-              <th>Assignee</th>
-              <th>Due Date</th>
-              <th>Category</th>
-              <th>Description</th>
-              <th>Assignor</th>
-              <th>Uploaded</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.length > 0 ? (
-              tasks.map((task, index) => (
-                <tr key={task.TaskID}>
-                  <td>{index + 1}</td>
-                  <td>{task.Title}</td>
+        <Row>
+          {tasks.length > 0 ? (
+            tasks.map((task) => (
+              <Col md={6} lg={4} key={task.TaskID} className="mb-4">
+                <Card className="task-card">
+                  <Card.Body>
+                    <Card.Title className="d-flex justify-content-between align-items-center">
+                      {task.Title}
+                      <Button
+                        variant="link"
+                        onClick={() => toggleDetails(task.TaskID)}
+                        aria-expanded={expandedTask === task.TaskID}
+                        aria-controls={`task-details-${task.TaskID}`}
+                      >
+                        {expandedTask === task.TaskID ? "▲" : "▼"}
+                      </Button>
+                    </Card.Title>
+                    <Collapse in={expandedTask === task.TaskID}>
+                      <div id={`task-details-${task.TaskID}`}>
+                        <Card.Text>
+                          <strong>Due Date:</strong> {task.DueDate || "No due date"} <br />
+                          <strong>Category:</strong> {task.Category} <br />
+                          <strong>Description:</strong> {task.Description} <br />
+                          <strong>Uploaded:</strong> {task.UploadedDocs ? "Yes" : "No"}
+                        </Card.Text>
 
-                  {/* Assignee Dropdown */}
-                  <td>
-                    <Form.Select
-                      name="Assignee"
-                      value={task.Assignee || ""}
-                      onChange={(e) => handleChange(e, task.TaskID)}
-                      disabled={!assignees.length}
-                    >
-                      <option value="">Select</option>
-                      {assignees.map((user) => (
-                        <option key={user.UserID} value={user.UserID}>
-                          {user.Assignee}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </td>
+                        {/* Assignee Dropdown */}
+                        <Form.Group className="mb-3">
+                          <Form.Label>Assignee</Form.Label>
+                          <Form.Select
+                            name="Assignee"
+                            value={task.Assignee || ""}
+                            onChange={(e) => handleChange(e, task.TaskID)}
+                            disabled={!assignees.length}
+                          >
+                            <option value="">Select</option>
+                            {assignees.map((user) => (
+                              <option key={user.UserID} value={user.UserID}>
+                                {user.Assignee}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </Form.Group>
 
-                  <td>{task.DueDate || "No due date"}</td>
-                  <td>{task.Category}</td>
-                  <td>{task.Description}</td>
+                        {/* Assignor Dropdown */}
+                        <Form.Group className="mb-3">
+                          <Form.Label>Assignor</Form.Label>
+                          <Form.Select
+                            name="Assignor"
+                            value={task.Assignor || ""}
+                            onChange={(e) => handleChange(e, task.TaskID)}
+                            disabled={!assignors.length}
+                          >
+                            <option value="">Select</option>
+                            {assignors.map((assignor) => (
+                              <option key={assignor.UserID} value={assignor.UserID}>
+                                {assignor.Name}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </Form.Group>
 
-                  {/* Assignor Dropdown */}
-                  <td>
-                    <Form.Select
-                      name="Assignor"
-                      value={task.Assignor || ""}
-                      onChange={(e) => handleChange(e, task.TaskID)}
-                      disabled={!assignors.length}
-                    >
-                      <option value="">Select</option>
-                      {assignors.map((assignor) => (
-                        <option key={assignor.UserID} value={assignor.UserID}>
-                          {assignor.Name}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </td>
+                        {/* Status Dropdown */}
+                        <Form.Group className="mb-3">
+                          <Form.Label>Status</Form.Label>
+                          <Form.Select
+                            name="Status"
+                            value={task.Status || "Pending"}
+                            onChange={(e) => handleChange(e, task.TaskID)}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Assigned">Assigned</option>
+                          </Form.Select>
+                        </Form.Group>
 
-                  <td>{task.UploadedDocs ? "Yes" : "No"}</td>
-
-                  {/* Status Dropdown */}
-                  <td>
-                    <Form.Select
-                      name="Status"
-                      value={task.Status || "Pending"}
-                      onChange={(e) => handleChange(e, task.TaskID)}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Assigned">Assigned</option>
-                    </Form.Select>
-                  </td>
-
-                  {/* Action Buttons */}
-                  <td>
-                    <Button variant="info" className="me-2" href={`/task/${task.TaskID}`}>
-                      Read
-                    </Button>
-                    <Button variant="warning" className="me-2" href={`/edit-task/${task.TaskID}`}>
-                      Update
-                    </Button>
-                    <Button variant="danger" onClick={() => handleDelete(task.TaskID)}>
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="10" className="text-center">
-                  No data available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
+                        {/* Action Buttons */}
+                        <div className="d-flex justify-content-between mt-3">
+                          <Button variant="info" href={`/task/${task.TaskID}`}>
+                            Read
+                          </Button>
+                          <Button variant="warning" href={`/edit-task/${task.TaskID}`}>
+                            Update
+                          </Button>
+                          <Button variant="danger" onClick={() => handleDelete(task.TaskID)}>
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </Collapse>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))
+          ) : (
+            <div className="text-center">
+              <p>No tasks available</p>
+            </div>
+          )}
+        </Row>
       )}
     </Container>
   );

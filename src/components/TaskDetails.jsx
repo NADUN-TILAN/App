@@ -1,81 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Container, Card, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
+import { Modal, Button, Spinner, Alert, Card } from "react-bootstrap";
 
-const ReadTask = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+const TaskDetailsModal = ({ show, onHide, taskID, category }) => {
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchReadTask = async () => {
-      try {
-        console.log(`Fetching Task: ID=${id}`);
-
-        const response = await fetch(`https://localhost:44346/api/tasks/details/${id}`);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch task details (HTTP ${response.status})`);
+    if (show) {
+      const fetchReadTask = async () => {
+        try {
+          const response = await fetch(`https://localhost:44346/api/tasks/details/${taskID}/${category}`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch task details");
+          }
+          const data = await response.json();
+          if (!Array.isArray(data) || data.length === 0) {
+            throw new Error("Task not found or empty response.");
+          }
+          setTask(data[0]);
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
         }
+      };
+      fetchReadTask();
+    }
+  }, [show, taskID, category]);
 
-        const data = await response.json();
-        console.log("API Response Data:", data);
-
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-          throw new Error("Task not found or empty response.");
-        }
-
-        // Handle case where API response is an object instead of an array
-        const taskData = Array.isArray(data) ? data[0] : data;
-        setTask(taskData);
-      } catch (error) {
-        console.error("Fetch Error:", error);
-        setError(error.message || "An unexpected error occurred.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReadTask();
-  }, [id]);
-
-  useEffect(() => {
-    console.log("Updated Task State:", task);
-  }, [task]);
-
-  if (loading) {
-    return (
-      <Container className="mt-4 text-center">
-        <Spinner animation="border" variant="primary" />
-        <p>Loading task details...</p>
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container className="mt-4">
-        <Alert variant="danger">
-          <p>Error: {error}</p>
-        </Alert>
-      </Container>
-    );
-  }
-
-  if (!task) {
-    return (
-      <Container className="mt-4">
-        <Alert variant="warning">
-          <p>No task details found.</p>
-        </Alert>
-      </Container>
-    );
-  }
-
-  // Format Due Date
-  const formattedDueDate = task.DueDate
+  const formattedDueDate = task?.DueDate
     ? new Date(task.DueDate).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -84,10 +38,20 @@ const ReadTask = () => {
     : "No due date";
 
   return (
-    <Container className="mt-4">
-      <Row className="justify-content-center">
-        <Col md={6} lg={4}>
-          <Card className="task-details-card shadow-sm">
+    <Modal show={show} onHide={onHide} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Task Details</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {loading ? (
+          <div className="text-center">
+            <Spinner animation="border" variant="primary" />
+            <p>Loading task details...</p>
+          </div>
+        ) : error ? (
+          <Alert variant="danger">{error}</Alert>
+        ) : (
+          <Card>
             <Card.Body>
               <div className="text-center mb-3">
                 <Card.Img
@@ -98,29 +62,29 @@ const ReadTask = () => {
                   alt="Task"
                 />
               </div>
-              <h3 className="text-center">{task.Title ?? "N/A"}</h3>
-              <p className="text-center text-muted">{task.Category ?? "Uncategorized"}</p>
+              <h3 className="text-center">{task?.Title ?? "N/A"}</h3>
+              <p className="text-center text-muted">{task?.Category ?? "Uncategorized"}</p>
               <hr />
               <p>
                 <strong>Due Date:</strong> {formattedDueDate}
               </p>
               <p>
-                <strong>Description:</strong> {task.Description ?? "No description available"}
+                <strong>Category:</strong> {task?.Category ?? "No category available"}
               </p>
               <p>
-                <strong>Status:</strong> {task.Status ?? "Pending"}
+                <strong>Description:</strong> {task?.Description ?? "No description available"}
               </p>
-              <div className="text-center mt-3">
-                <Button variant="secondary" onClick={() => navigate(-1)}>
-                  Back
-                </Button>
-              </div>
             </Card.Body>
           </Card>
-        </Col>
-      </Row>
-    </Container>
+        )}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onHide}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
-export default ReadTask;
+export default TaskDetailsModal;

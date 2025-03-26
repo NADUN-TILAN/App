@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Container, Col, Row } from "react-bootstrap";
+import { Table, Button, Container, Col, Row, Modal } from "react-bootstrap"; // Added Modal
 import { useNavigate } from "react-router-dom";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
-  const navigate = useNavigate(); // For navigation
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal state
+  const [selectedUser, setSelectedUser] = useState(null); // Selected user for deletion
+  const navigate = useNavigate();
 
   // Fetch users only once on mount
   useEffect(() => {
@@ -25,12 +27,12 @@ const UserList = () => {
       console.error("Error fetching users:", error);
     }
   };
-//delete
-  const handleDelete = async (id, firstName, lastName) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+
+  const handleDelete = async () => {
+    if (selectedUser) {
       try {
         const response = await fetch(
-          `https://localhost:44346/api/users/${id}/${firstName}/${lastName}`,
+          `https://localhost:44346/api/users/${selectedUser.UserID}/${selectedUser.FirstName}/${selectedUser.LastName}`,
           {
             method: "DELETE",
           }
@@ -38,8 +40,9 @@ const UserList = () => {
 
         if (response.ok) {
           setUsers((prevUsers) =>
-            prevUsers.filter((user) => user.UserID !== id)
+            prevUsers.filter((user) => user.UserID !== selectedUser.UserID)
           );
+          setShowDeleteModal(false); // Close modal after successful deletion
         } else {
           alert("Error deleting user!");
         }
@@ -47,6 +50,16 @@ const UserList = () => {
         console.error("Error:", error);
       }
     }
+  };
+
+  const openDeleteModal = (user) => {
+    setSelectedUser(user);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setSelectedUser(null);
   };
 
   return (
@@ -90,7 +103,6 @@ const UserList = () => {
                 <td>{user.Email}</td>
                 <td>{user.ContactNo}</td>
                 <td>
-                  
                   <Button
                     variant="info"
                     className="me-2"
@@ -111,9 +123,7 @@ const UserList = () => {
                   </Button>
                   <Button
                     variant="danger"
-                    onClick={() =>
-                      handleDelete(user.UserID, user.FirstName, user.LastName)
-                    }
+                    onClick={() => openDeleteModal(user)} // Open modal
                   >
                     Delete
                   </Button>
@@ -129,6 +139,28 @@ const UserList = () => {
           )}
         </tbody>
       </Table>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={closeDeleteModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete{" "}
+          <strong>
+            {selectedUser?.FirstName} {selectedUser?.LastName}
+          </strong>
+          ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeDeleteModal}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
